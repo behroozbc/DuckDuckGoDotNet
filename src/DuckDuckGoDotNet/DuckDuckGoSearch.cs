@@ -402,6 +402,25 @@ namespace DuckDuckGoDotNet
             return results;
         }
 
+        /// <summary>
+        /// DuckDuckGo images search. Query params: https://duckduckgo.com/params.
+        /// </summary>
+        /// <param name="keywords">Keywords for query.</param>
+        /// <param name="region">wt-wt, us-en, uk-en, ru-ru, etc. Defaults to "wt-wt".</param>
+        /// <param name="safesearch">on, moderate, off. Defaults to "moderate".</param>
+        /// <param name="timelimit">Day, Week, Month, Year. Defaults to null.</param>
+        /// <param name="size">Small, Medium, Large, Wallpaper. Defaults to null.</param>
+        /// <param name="color">color, Monochrome, Red, Orange, Yellow, Green, Blue,
+        ///     Purple, Pink, Brown, Black, Gray, Teal, White. Defaults to null.</param>
+        /// <param name="typeImage">photo, clipart, gif, transparent, line.
+        ///     Defaults to null.</param>
+        /// <param name="layout">Square, Tall, Wide. Defaults to null.</param>
+        /// <param name="licenseImage">any (All Creative Commons), Public (PublicDomain),
+        ///     Share (Free to Share and Use), ShareCommercially (Free to Share and Use Commercially),
+        ///     Modify (Free to Modify, Share, and Use), ModifyCommercially (Free to Modify, Share, and
+        ///     Use Commercially). Defaults to null.</param>
+        /// <param name="maxResults">Max number of results. If null, returns results only from the first response. Defaults to null.</param>
+        /// <returns>List of dictionaries with image search results.</returns>
         public async Task<IEnumerable<ImageSearchItem>> ImagesAsync(
             string keywords,
             string region = "wt-wt",

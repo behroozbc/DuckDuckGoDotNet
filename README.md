@@ -55,7 +55,7 @@ var results= new DuckDuckGoSearch().Chat("Tell me about Iran's history",Model.Ll
         ///     lite - collect data from https://lite.duckduckgo.com.
         /// </param>
         /// <param name="maxResults">Max number of results. If null, returns results only from the first response. Defaults to null.</param>
-        /// <returns>List of dictionaries with search results. [title,href,body]</returns>
+        /// <returns>List of dictionaries with search results.</returns>
         public async Task<List<Dictionary<string, string>>> TextAsync(
             string keywords,
             string region = "wt-wt",
@@ -74,7 +74,11 @@ foreach (var item in search)
     Console.WriteLine(a);
 }
 ```
+## تصویر
 
+## فیلم
+
+## اخبار
 
 ## سلب مسئولیت
 

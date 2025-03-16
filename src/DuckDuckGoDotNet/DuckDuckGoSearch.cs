@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using DuckDuckGoDotNet.AI;
+using DuckDuckGoDotNet.Search;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 
@@ -257,7 +258,7 @@ namespace DuckDuckGoDotNet
         /// </param>
         /// <param name="maxResults">Max number of results. If null, returns results only from the first response. Defaults to null.</param>
         /// <returns>List of dictionaries with search results.</returns>
-        public async Task<List<Dictionary<string, string>>> TextAsync(
+        public async Task<IEnumerable<TextSearchItem>> TextAsync(
             string keywords,
             string region = "wt-wt",
             string safesearch = "moderate",
@@ -285,10 +286,10 @@ namespace DuckDuckGoDotNet
                     if (b == backends.Last()) throw new DuckDuckGoSearchException(ex.Message, ex);
                 }
             }
-            return new List<Dictionary<string, string>>();
+            return Array.Empty<TextSearchItem>();
         }
 
-        private async Task<List<Dictionary<string, string>>> TextHtmlAsync(string keywords, string region = "wt-wt", string timelimit = null, int? maxResults = null)
+        private async Task<IEnumerable<TextSearchItem>> TextHtmlAsync(string keywords, string region = "wt-wt", string timelimit = null, int? maxResults = null)
         {
             if (string.IsNullOrEmpty(keywords)) throw new ArgumentException("keywords is mandatory");
 
@@ -296,7 +297,7 @@ namespace DuckDuckGoDotNet
             if (!string.IsNullOrEmpty(timelimit)) payload["df"] = timelimit;
 
             var cache = new HashSet<string>();
-            var results = new List<Dictionary<string, string>>();
+            var results = new List<TextSearchItem>();
 
             for (int i = 0; i < 5; i++)
             {
@@ -318,11 +319,11 @@ namespace DuckDuckGoDotNet
                         cache.Add(href);
                         string title = e.SelectSingleNode("./h2/a")?.InnerText ?? "";
                         string body = string.Join("", e.SelectSingleNode("./a")?.Descendants().Where(n => n.NodeType == HtmlNodeType.Text).Select(n => n.InnerText) ?? Array.Empty<string>());
-                        results.Add(new Dictionary<string, string>
+                        results.Add(new()
                         {
-                            {"title", Utils.Normalize(title)},
-                            {"href", Utils.NormalizeUrl(href)},
-                            {"body", Utils.Normalize(body)}
+                            Title = Utils.Normalize(title),
+                            Href = Utils.NormalizeUrl(href),
+                            Description = Utils.Normalize(body)
                         });
                         if (maxResults.HasValue && results.Count >= maxResults.Value) return results;
                     }
@@ -340,7 +341,7 @@ namespace DuckDuckGoDotNet
             return results;
         }
 
-        private async Task<List<Dictionary<string, string>>> TextLiteAsync(string keywords, string region = "wt-wt", string timelimit = null, int? maxResults = null)
+        private async Task<IEnumerable<TextSearchItem>> TextLiteAsync(string keywords, string region = "wt-wt", string timelimit = null, int? maxResults = null)
         {
             if (string.IsNullOrEmpty(keywords)) throw new ArgumentException("keywords is mandatory");
 
@@ -348,7 +349,7 @@ namespace DuckDuckGoDotNet
             if (!string.IsNullOrEmpty(timelimit)) payload["df"] = timelimit;
 
             var cache = new HashSet<string>();
-            var results = new List<Dictionary<string, string>>();
+            var results = new List<TextSearchItem>();
 
             for (int i = 0; i < 5; i++)
             {
@@ -379,11 +380,11 @@ namespace DuckDuckGoDotNet
                     else if (rowIndex == 2 && href != null)
                     {
                         string body = e.SelectSingleNode(".//td[@class='result-snippet']")?.InnerText.Trim() ?? "";
-                        results.Add(new Dictionary<string, string>
+                        results.Add(new()
                         {
-                            {"title", Utils.Normalize(title)},
-                            {"href", Utils.NormalizeUrl(href)},
-                            {"body", Utils.Normalize(body)}
+                            Title = Utils.Normalize(title),
+                            Href = Utils.NormalizeUrl(href),
+                            Description = Utils.Normalize(body)
                         });
                         if (maxResults.HasValue && results.Count >= maxResults.Value) return results;
                     }
@@ -401,7 +402,7 @@ namespace DuckDuckGoDotNet
             return results;
         }
 
-        public async Task<List<Dictionary<string, string>>> ImagesAsync(
+        public async Task<IEnumerable<ImageSearchItem>> ImagesAsync(
             string keywords,
             string region = "wt-wt",
             string safesearch = "moderate",
@@ -432,7 +433,7 @@ namespace DuckDuckGoDotNet
             };
 
             var cache = new HashSet<string>();
-            var results = new List<Dictionary<string, string>>();
+            var results = new List<ImageSearchItem>();
 
             for (int i = 0; i < 5; i++)
             {
@@ -447,15 +448,15 @@ namespace DuckDuckGoDotNet
                     if (imageUrl != null && !cache.Contains(imageUrl))
                     {
                         cache.Add(imageUrl);
-                        results.Add(new Dictionary<string, string>
+                        results.Add(new()
                         {
-                            {"title", row["title"].ToString()},
-                            {"image", Utils.NormalizeUrl(imageUrl)},
-                            {"thumbnail", Utils.NormalizeUrl(row["thumbnail"].ToString())},
-                            {"url", Utils.NormalizeUrl(row["url"].ToString())},
-                            {"height", row["height"].ToString()},
-                            {"width", row["width"].ToString()},
-                            {"source", row["source"].ToString()}
+                            Title = row["title"].ToString(),
+                            Image = Utils.NormalizeUrl(imageUrl),
+                            Thumbnail = Utils.NormalizeUrl(row["thumbnail"].ToString()),
+                            URL = Utils.NormalizeUrl(row["url"].ToString()),
+                            Height = row["height"].ToString(),
+                            Width = row["width"].ToString(),
+                            Source = row["source"].ToString()
                         });
                         if (maxResults.HasValue && results.Count >= maxResults.Value) return results;
                     }
@@ -521,7 +522,7 @@ namespace DuckDuckGoDotNet
             return results;
         }
 
-        public async Task<List<Dictionary<string, string>>> NewsAsync(
+        public async Task<IEnumerable<NewsSearchItem>> NewsAsync(
             string keywords,
             string region = "wt-wt",
             string safesearch = "moderate",
@@ -539,7 +540,7 @@ namespace DuckDuckGoDotNet
             if (!string.IsNullOrEmpty(timelimit)) payload["df"] = timelimit;
 
             var cache = new HashSet<string>();
-            var results = new List<Dictionary<string, string>>();
+            var results = new List<NewsSearchItem>();
 
             for (int i = 0; i < 5; i++)
             {
@@ -555,14 +556,14 @@ namespace DuckDuckGoDotNet
                     {
                         cache.Add(url);
                         string imageUrl = row.ContainsKey("image") ? row["image"]?.ToString() : null;
-                        results.Add(new Dictionary<string, string>
+                        results.Add(new()
                         {
-                            {"date", DateTimeOffset.FromUnixTimeSeconds(long.Parse(row["date"].ToString())).ToString("O")},
-                            {"title", row["title"].ToString()},
-                            {"body", Utils.Normalize(row["excerpt"].ToString())},
-                            {"url", Utils.NormalizeUrl(url)},
-                            {"image", imageUrl != null ? Utils.NormalizeUrl(imageUrl) : null},
-                            {"source", row["source"].ToString()}
+                            Date = DateTimeOffset.FromUnixTimeSeconds(long.Parse(row["date"].ToString())),
+                            Title = row["title"].ToString(),
+                            Body = Utils.Normalize(row["excerpt"].ToString()),
+                            URL = Utils.NormalizeUrl(url),
+                            Image = imageUrl != null ? Utils.NormalizeUrl(imageUrl) : null,
+                            Source = row["source"].ToString()
                         });
                         if (maxResults.HasValue && results.Count >= maxResults.Value) return results;
                     }

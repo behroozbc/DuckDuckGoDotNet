@@ -50,11 +50,11 @@ public static class Utils
     }
 
     // Normalize URL by decoding and replacing spaces, equivalent to _normalize_url
-    public static string NormalizeUrl(string url)
+    public static Uri NormalizeUrl(string url)
     {
-        if (string.IsNullOrEmpty(url)) return "";
+        if (string.IsNullOrEmpty(url)) return new Uri("");
         string decoded = WebUtility.UrlDecode(url); // Equivalent to Python's urllib.parse.unquote
-        return decoded.Replace(" ", "+");
+        return new Uri(decoded.Replace(" ", "+"));
     }
 
     // Expand proxy "tb" alias, equivalent to _expand_proxy_tb_alias

@@ -4,6 +4,8 @@
 
 طراحی این کتاب خانه از کتاب خانه [duckduckgo_search](https://github.com/deedy5/duckduckgo_search) الگو برداری شده.
 
+## [English version](./README_EN.md)
+
 ## فهرست مطالب
 
 - [نصب](#نصب)
@@ -151,7 +153,9 @@ foreach (var item in search)
 ```
 
 ## اخبار
+
 عملیات جست و جو اخبار رو با دستور `NewsAsync` میتوانید انجام دهید.
+
 ```C#
         /// <summary>
         /// DuckDuckGo news search. Query params: https://duckduckgo.com/params.

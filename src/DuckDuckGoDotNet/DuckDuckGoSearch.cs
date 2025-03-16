@@ -101,11 +101,12 @@ namespace DuckDuckGoDotNet
             Dictionary<string, string> headers = null,
             Dictionary<string, string> cookies = null,
             object json = null,
-            float? timeout = null)
+            int? timeout = null)
         {
             try
             {
                 var request = new HttpRequestMessage(new HttpMethod(method), url);
+
                 if (paramsDict != null)
                 {
                     var query = string.Join("&", paramsDict.Select(kvp => $"{WebUtility.UrlEncode(kvp.Key)}={WebUtility.UrlEncode(kvp.Value)}"));
@@ -130,6 +131,8 @@ namespace DuckDuckGoDotNet
                         request.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
+                if (timeout is not null)
+                    client.Timeout = TimeSpan.FromSeconds(timeout.Value);
                 var response = await client.SendAsync(request);
                 logger.LogDebug($"_get_url() {response.RequestMessage.RequestUri} {response.StatusCode}");
                 if (response.StatusCode == HttpStatusCode.OK)
@@ -175,9 +178,11 @@ namespace DuckDuckGoDotNet
             var jsonData = new { model = Models.GetModel(model), messages = chatMessages };
             var request = new HttpRequestMessage(HttpMethod.Post, "https://duckduckgo.com/duckchat/v1/chat")
             {
-                Content = new StringContent(JsonSerializer.Serialize(jsonData), Encoding.UTF8, "application/json")
+                Content = new StringContent(JsonSerializer.Serialize(jsonData), Encoding.UTF8, "application/json"),
+
             };
             request.Headers.Add("x-vqd-4", chatVqd);
+            // client.Timeout = TimeSpan.FromSeconds(timeout);
 
             var response = client.Send(request);
             chatVqd = response.Headers.GetValues("x-vqd-4").FirstOrDefault() ?? chatVqd;

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DockDockGoDotNet\DockDockGoDotNet.csproj" />
+    <ProjectReference Include="..\DuckDuckGoDotNet\DuckDuckGoDotNet.csproj" />
   </ItemGroup>
 
 </Project>

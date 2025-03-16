@@ -1,4 +1,4 @@
-﻿namespace DockDockGoDotNet;
+﻿namespace DuckDuckGoDotNet;
 
 using System;
 using System.Text;
@@ -12,49 +12,6 @@ public static class Utils
 {
     // Compiled regex for stripping HTML tags, equivalent to Python's REGEX_STRIP_TAGS
     private static readonly Regex StripTagsRegex = new Regex("<.*?>", RegexOptions.Compiled);
-
-    // Custom exception class equivalent to DuckDuckGoSearchException in Python
-    // JSON serialization equivalent to json_dumps
-    public static string JsonDumps(object obj)
-    {
-        try
-        {
-            // In Python, orjson is used if available for performance, else json with indent=2
-            // In C#, we use System.Text.Json with indentation (no orjson equivalent needed)
-            return JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true });
-        }
-        catch (Exception ex)
-        {
-            throw new DuckDuckGoSearchException($"{ex.GetType().Name}: {ex.Message}", ex);
-        }
-    }
-
-    // JSON deserialization equivalent to json_loads
-    // Python accepts str | bytes; we'll provide two overloads for string and byte[]
-    public static JsonElement JsonLoads(string json)
-    {
-        try
-        {
-            return JsonSerializer.Deserialize<JsonElement>(json);
-        }
-        catch (Exception ex)
-        {
-            throw new DuckDuckGoSearchException($"{ex.GetType().Name}: {ex.Message}", ex);
-        }
-    }
-
-    public static JsonElement JsonLoads(byte[] jsonBytes)
-    {
-        try
-        {
-            string json = Encoding.UTF8.GetString(jsonBytes);
-            return JsonSerializer.Deserialize<JsonElement>(json);
-        }
-        catch (Exception ex)
-        {
-            throw new DuckDuckGoSearchException($"{ex.GetType().Name}: {ex.Message}", ex);
-        }
-    }
 
     // Extract vqd value from HTML bytes, equivalent to _extract_vqd
     public static string ExtractVqd(byte[] htmlBytes, string keywords)

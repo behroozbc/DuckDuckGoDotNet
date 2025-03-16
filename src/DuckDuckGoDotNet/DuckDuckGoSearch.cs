@@ -1,11 +1,11 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using DockDockGoDotNet.AI;
+using DuckDuckGoDotNet.AI;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 
-namespace DockDockGoDotNet
+namespace DuckDuckGoDotNet
 {
     public class DuckDuckGoSearch
     {
@@ -164,7 +164,7 @@ namespace DockDockGoDotNet
         {
             if (string.IsNullOrEmpty(chatVqd))
             {
-                using var resp = await GetUrl("GET", "https://duckduckgo.com/duckchat/v1/status", headers: new Dictionary<string, string> { { "x-vqd-accept", "1" } });
+                using var resp = await GetUrl("GET", "https://duckduckgo.com/duckchat/v1/status", headers: new Dictionary<string, string> { { "x-vqd-accept", "1" } }, timeout: timeout);
                 chatVqd = resp.Headers.GetValues("x-vqd-4").FirstOrDefault() ?? "";
             }
 

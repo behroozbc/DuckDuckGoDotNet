@@ -1,4 +1,4 @@
-namespace DockDockGoDotNet;
+namespace DuckDuckGoDotNet;
 public class DuckDuckGoSearchException : Exception
 {
     public DuckDuckGoSearchException(string message) : base(message) { }

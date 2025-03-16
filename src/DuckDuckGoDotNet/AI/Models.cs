@@ -1,4 +1,4 @@
-namespace DockDockGoDotNet.AI;
+namespace DuckDuckGoDotNet.AI;
 public class Models
 {
     private static readonly string Gpt4oMini = "gpt-4o-mini";

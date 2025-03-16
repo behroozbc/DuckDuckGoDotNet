@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using System.ComponentModel.DataAnnotations;
-using DockDockGoDotNet;
-using DockDockGoDotNet.AI;
+
+using DuckDuckGoDotNet;
+using DuckDuckGoDotNet.AI;
 
 var d=new DuckDuckGoSearch();
 var results= d.Chat("Tell me about Iran's history",Model.Llama3370b);

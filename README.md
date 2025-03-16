@@ -9,7 +9,7 @@
 * [نصب](#نصب)
 * [پروکسی](#پروکسی)
 * [چت](#چت)
-* [جست و جو](#جستوجو)
+* [جستوجو](#جستوجو)
 ## نصب
 برای نصب این کتابخانه در پروژه خود باید از نوگت این کتاب خانه را دانلود کنید.
 ```bash
@@ -39,7 +39,7 @@ dotnet add DuckDuckGoDotNet
 var results= new DuckDuckGoSearch().Chat("Tell me about Iran's history",Model.Llama3370b);
 ```
 
-## جست و جو
+## جستوجو
 عملیات جست و جو رو با دستور `TextAsync` میتوانید انجام دهید.
 ```c#
         /// <summary>

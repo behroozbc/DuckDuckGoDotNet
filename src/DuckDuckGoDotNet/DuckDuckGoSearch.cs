@@ -420,7 +420,7 @@ namespace DuckDuckGoDotNet
         ///     Modify (Free to Modify, Share, and Use), ModifyCommercially (Free to Modify, Share, and
         ///     Use Commercially). Defaults to null.</param>
         /// <param name="maxResults">Max number of results. If null, returns results only from the first response. Defaults to null.</param>
-        /// <returns>List of dictionaries with image search results.</returns>
+        /// <returns>List of image search results.</returns>
         public async Task<IEnumerable<ImageSearchItem>> ImagesAsync(
             string keywords,
             string region = "wt-wt",
@@ -487,7 +487,18 @@ namespace DuckDuckGoDotNet
             }
             return results;
         }
-
+        /// <summary>
+        /// DuckDuckGo videos search. Query params: https://duckduckgo.com/params.
+        /// </summary>
+        /// <param name="keywords">Keywords for query.</param>
+        /// <param name="region">wt-wt, us-en, uk-en, ru-ru, etc. Defaults to "wt-wt".</param>
+        /// <param name="safesearch">on, moderate, off. Defaults to "moderate".</param>
+        /// <param name="timelimit">d, w, m. Defaults to null.</param>
+        /// <param name="resolution">high, standard. Defaults to null.</param>
+        /// <param name="duration">short, medium, long. Defaults to null.</param>
+        /// <param name="licenseVideos">creativeCommon, youtube. Defaults to null.</param>
+        /// <param name="maxResults">Max number of results. If null, returns results only from the first response. Defaults to null.</param>
+        /// <returns>List of video search results.</returns>
         public async Task<List<Dictionary<string, string>>> VideosAsync(
             string keywords,
             string region = "wt-wt",
@@ -540,7 +551,15 @@ namespace DuckDuckGoDotNet
             }
             return results;
         }
-
+        /// <summary>
+        /// DuckDuckGo news search. Query params: https://duckduckgo.com/params.
+        /// </summary>
+        /// <param name="keywords">Keywords for query.</param>
+        /// <param name="region">wt-wt, us-en, uk-en, ru-ru, etc. Defaults to "wt-wt".</param>
+        /// <param name="safesearch">on, moderate, off. Defaults to "moderate".</param>
+        /// <param name="timelimit">d, w, m. Defaults to null.</param>
+        /// <param name="maxResults">Max number of results. If null, returns results only from the first response. Defaults to null.</param>
+        /// <returns>List of news search results.</returns>
         public async Task<IEnumerable<NewsSearchItem>> NewsAsync(
             string keywords,
             string region = "wt-wt",

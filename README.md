@@ -6,17 +6,21 @@
 
 ## فهرست مطالب
 
-* [نصب](#نصب)
-* [پروکسی](#پروکسی)
-* [چت](#چت)
-* [جستوجو](#جستوجو)
+- [نصب](#نصب)
+- [پروکسی](#پروکسی)
+- [چت](#چت)
+- [جستوجو](#جستوجو)
+
 ## نصب
+
 برای نصب این کتابخانه در پروژه خود باید از نوگت این کتاب خانه را دانلود کنید.
+
 ```bash
 dotnet add DuckDuckGoDotNet
 ```
 
 ## پروکسی
+
 پکیج از پروکسی‌های http/https/socks پشتیبانی می‌کند. مثال: http://user:pass@example.com:3128. از یک پروکسی چرخشی استفاده کنید. در غیر این صورت، با هر بار مقداردهی اولیه کلاس DuckDuckGoSearch از یک پروکسی جدید استفاده کنید.
 
 ## چت
@@ -34,13 +38,17 @@ dotnet add DuckDuckGoDotNet
         /// <returns>The response from the AI as a string.</returns>
         public string Chat(string message, Model model = Model.Gpt4oMini, int timeout = 30)
 ```
-***نمونه***
+
+**_نمونه_**
+
 ```python
 var results= new DuckDuckGoSearch().Chat("Tell me about Iran's history",Model.Llama3370b);
 ```
 
 ## جستوجو
+
 عملیات جست و جو رو با دستور `TextAsync` میتوانید انجام دهید.
+
 ```c#
         /// <summary>
         /// DuckDuckGo text search. Query params: https://duckduckgo.com/params.
@@ -55,8 +63,8 @@ var results= new DuckDuckGoSearch().Chat("Tell me about Iran's history",Model.Ll
         ///     lite - collect data from https://lite.duckduckgo.com.
         /// </param>
         /// <param name="maxResults">Max number of results. If null, returns results only from the first response. Defaults to null.</param>
-        /// <returns>List of dictionaries with search results.</returns>
-        public async Task<List<Dictionary<string, string>>> TextAsync(
+        /// <returns>List of search results.</returns>
+        public async Task<IEnumerable<TextSearchItem>> TextAsync(
             string keywords,
             string region = "wt-wt",
             string safesearch = "moderate",
@@ -65,7 +73,9 @@ var results= new DuckDuckGoSearch().Chat("Tell me about Iran's history",Model.Ll
             int? maxResults = null)
 
 ```
-***نمونه***
+
+**_نمونه_**
+
 ```C#
 var search=await (new DuckDuckGoSearch()).Text("Iran");
 foreach (var item in search)
@@ -74,8 +84,11 @@ foreach (var item in search)
     Console.WriteLine(a);
 }
 ```
+
 ## تصویر
+
 عملیات جست و جو تصویر رو با دستور `ImagesAsync` میتوانید انجام دهید.
+
 ```C#
  /// <summary>
         /// DuckDuckGo images search. Query params: https://duckduckgo.com/params.
@@ -95,7 +108,7 @@ foreach (var item in search)
         ///     Modify (Free to Modify, Share, and Use), ModifyCommercially (Free to Modify, Share, and
         ///     Use Commercially). Defaults to null.</param>
         /// <param name="maxResults">Max number of results. If null, returns results only from the first response. Defaults to null.</param>
-        /// <returns>List of dictionaries with image search results.</returns>
+        /// <returns>List of image search results.</returns>
         public async Task<IEnumerable<ImageSearchItem>> ImagesAsync(
             string keywords,
             string region = "wt-wt",
@@ -108,9 +121,54 @@ foreach (var item in search)
             string licenseImage = null,
             int? maxResults = null)
 ```
+
 ## فیلم
 
+عملیات جست و جو فیلم رو با دستور `VideosAsync` میتوانید انجام دهید.
+
+```C#
+/// <summary>
+        /// DuckDuckGo videos search. Query params: https://duckduckgo.com/params.
+        /// </summary>
+        /// <param name="keywords">Keywords for query.</param>
+        /// <param name="region">wt-wt, us-en, uk-en, ru-ru, etc. Defaults to "wt-wt".</param>
+        /// <param name="safesearch">on, moderate, off. Defaults to "moderate".</param>
+        /// <param name="timelimit">d, w, m. Defaults to null.</param>
+        /// <param name="resolution">high, standard. Defaults to null.</param>
+        /// <param name="duration">short, medium, long. Defaults to null.</param>
+        /// <param name="licenseVideos">creativeCommon, youtube. Defaults to null.</param>
+        /// <param name="maxResults">Max number of results. If null, returns results only from the first response. Defaults to null.</param>
+        /// <returns>List of dictionaries with video search results.</returns>
+        public async Task<IEnumerable<NewsSearchItem>> VideosAsync(
+            string keywords,
+            string region = "wt-wt",
+            string safesearch = "moderate",
+            string timelimit = null,
+            string resolution = null,
+            string duration = null,
+            string licenseVideos = null,
+            int? maxResults = null)
+```
+
 ## اخبار
+عملیات جست و جو اخبار رو با دستور `NewsAsync` میتوانید انجام دهید.
+```C#
+        /// <summary>
+        /// DuckDuckGo news search. Query params: https://duckduckgo.com/params.
+        /// </summary>
+        /// <param name="keywords">Keywords for query.</param>
+        /// <param name="region">wt-wt, us-en, uk-en, ru-ru, etc. Defaults to "wt-wt".</param>
+        /// <param name="safesearch">on, moderate, off. Defaults to "moderate".</param>
+        /// <param name="timelimit">d, w, m. Defaults to null.</param>
+        /// <param name="maxResults">Max number of results. If null, returns results only from the first response. Defaults to null.</param>
+        /// <returns>List of news search results.</returns>
+        public async Task<IEnumerable<NewsSearchItem>> NewsAsync(
+            string keywords,
+            string region = "wt-wt",
+            string safesearch = "moderate",
+            string timelimit = null,
+            int? maxResults = null)
+```
 
 ## سلب مسئولیت
 

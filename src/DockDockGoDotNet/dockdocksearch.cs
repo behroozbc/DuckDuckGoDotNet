@@ -1,20 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
 using DockDockGoDotNet;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 
-namespace DuckDuckGoSearch
+namespace DuckDuckGoSearchDotNet
 {
-    public class DDGS
+    public class DuckDuckGoSearch
     {
-        private static readonly ILogger<DDGS> logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<DDGS>();
+        private static readonly ILogger<DuckDuckGoSearch> logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<DuckDuckGoSearch>();
 
         private readonly HttpClient client;
         private readonly string proxy;
@@ -55,7 +50,7 @@ namespace DuckDuckGoSearch
             {"mistral-small-3", "mistralai/Mistral-Small-24B-Instruct-2501"}
         };
 
-        public DDGS(Dictionary<string, string> headers = null, string proxy = null, string proxies = null, int? timeout = 10, bool verify = true)
+        public DuckDuckGoSearch(Dictionary<string, string> headers = null, string proxy = null, string proxies = null, int? timeout = 10, bool verify = true)
         {
             string ddgsProxy = Environment.GetEnvironmentVariable("DDGS_PROXY");
             this.proxy = ddgsProxy ?? Utils.ExpandProxyTbAlias(proxy);
@@ -106,26 +101,7 @@ namespace DuckDuckGoSearch
             }
             return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36";
         }
-
-        private void Sleep(float sleeptime = 0.75f)
-        {
-            double delay = 0.0;
-            if (sleepTimestamp != 0.0)
-            {
-                double currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                if (currentTime - sleepTimestamp < 20)
-                {
-                    delay = sleeptime;
-                }
-            }
-            sleepTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            if (delay > 0)
-            {
-                Thread.Sleep((int)(delay * 1000));
-            }
-        }
-
-        private HttpResponseMessage GetUrl(
+        private async Task<HttpResponseMessage> GetUrl(
             string method,
             string url,
             Dictionary<string, string> paramsDict = null,
@@ -136,7 +112,6 @@ namespace DuckDuckGoSearch
             object json = null,
             float? timeout = null)
         {
-            Sleep();
             try
             {
                 var request = new HttpRequestMessage(new HttpMethod(method), url);
@@ -164,7 +139,7 @@ namespace DuckDuckGoSearch
                         request.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                var response = client.Send(request);
+                var response = await client.SendAsync(request);
                 logger.LogDebug($"_get_url() {response.RequestMessage.RequestUri} {response.StatusCode}");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
@@ -186,20 +161,20 @@ namespace DuckDuckGoSearch
             }
         }
 
-        private string GetVqd(string keywords)
+        private async Task<string> GetVqd(string keywords)
         {
-            using var resp = GetUrl("GET", "https://duckduckgo.com", new Dictionary<string, string> { { "q", keywords } });
+            using var resp = await GetUrl("GET", "https://duckduckgo.com", new Dictionary<string, string> { { "q", keywords } });
             using var stream = resp.Content.ReadAsStream();
             byte[] content = new byte[stream.Length];
             stream.Read(content, 0, content.Length);
             return Utils.ExtractVqd(content, keywords);
         }
 
-        public IEnumerable<string> ChatYield(string keywords, string model = "gpt-4o-mini", int timeout = 30)
+        public async IAsyncEnumerable<string> ChatYield(string keywords, string model = "gpt-4o-mini", int timeout = 30)
         {
             if (string.IsNullOrEmpty(chatVqd))
             {
-                using var resp = GetUrl("GET", "https://duckduckgo.com/duckchat/v1/status", headers: new Dictionary<string, string> { { "x-vqd-accept", "1" } });
+                using var resp = await GetUrl("GET", "https://duckduckgo.com/duckchat/v1/status", headers: new Dictionary<string, string> { { "x-vqd-accept", "1" } });
                 chatVqd = resp.Headers.GetValues("x-vqd-4").FirstOrDefault() ?? "";
             }
 
@@ -274,10 +249,10 @@ namespace DuckDuckGoSearch
 
         public string Chat(string keywords, string model = "gpt-4o-mini", int timeout = 30)
         {
-            return string.Join("", ChatYield(keywords, model, timeout));
+            return string.Join("", ChatYield(keywords, model, timeout).ToEnumerable());
         }
 
-        public List<Dictionary<string, string>> Text(
+        public async Task<List<Dictionary<string, string>>> Text(
             string keywords,
             string region = "wt-wt",
             string safesearch = "moderate",
@@ -297,7 +272,7 @@ namespace DuckDuckGoSearch
             {
                 try
                 {
-                    return b == "html" ? TextHtml(keywords, region, timelimit, maxResults) : TextLite(keywords, region, timelimit, maxResults);
+                    return b == "html" ? await TextHtml(keywords, region, timelimit, maxResults) :await TextLite(keywords, region, timelimit, maxResults);
                 }
                 catch (Exception ex)
                 {
@@ -308,7 +283,7 @@ namespace DuckDuckGoSearch
             return new List<Dictionary<string, string>>();
         }
 
-        private List<Dictionary<string, string>> TextHtml(string keywords, string region = "wt-wt", string timelimit = null, int? maxResults = null)
+        private async Task<List<Dictionary<string, string>>> TextHtml(string keywords, string region = "wt-wt", string timelimit = null, int? maxResults = null)
         {
             if (string.IsNullOrEmpty(keywords)) throw new ArgumentException("keywords is mandatory");
 
@@ -320,8 +295,8 @@ namespace DuckDuckGoSearch
 
             for (int i = 0; i < 5; i++)
             {
-                using var resp = GetUrl("POST", "https://html.duckduckgo.com/html", data: payload);
-                string html = resp.Content.ReadAsStringAsync().Result;
+                using var resp = await GetUrl("POST", "https://html.duckduckgo.com/html", data: payload);
+                string html = await resp.Content.ReadAsStringAsync();
                 if (html.Contains("No  results.")) return results;
 
                 var doc = new HtmlDocument();
@@ -360,7 +335,7 @@ namespace DuckDuckGoSearch
             return results;
         }
 
-        private List<Dictionary<string, string>> TextLite(string keywords, string region = "wt-wt", string timelimit = null, int? maxResults = null)
+        private async Task<List<Dictionary<string, string>>> TextLite(string keywords, string region = "wt-wt", string timelimit = null, int? maxResults = null)
         {
             if (string.IsNullOrEmpty(keywords)) throw new ArgumentException("keywords is mandatory");
 
@@ -372,8 +347,8 @@ namespace DuckDuckGoSearch
 
             for (int i = 0; i < 5; i++)
             {
-                using var resp = GetUrl("POST", "https://lite.duckduckgo.com/lite/", data: payload);
-                string html = resp.Content.ReadAsStringAsync().Result;
+                using var resp = await GetUrl("POST", "https://lite.duckduckgo.com/lite/", data: payload);
+                string html = await resp.Content.ReadAsStringAsync();
                 if (html.Contains("No more results.")) return results;
 
                 var doc = new HtmlDocument();
@@ -421,7 +396,7 @@ namespace DuckDuckGoSearch
             return results;
         }
 
-        public List<Dictionary<string, string>> Images(
+        public async Task<List<Dictionary<string, string>>> Images(
             string keywords,
             string region = "wt-wt",
             string safesearch = "moderate",
@@ -435,8 +410,8 @@ namespace DuckDuckGoSearch
         {
             if (string.IsNullOrEmpty(keywords)) throw new ArgumentException("keywords is mandatory");
 
-            string vqd = GetVqd(keywords);
-            var safesearchBase = new Dictionary<string, string> { {"on", "1"}, {"moderate", "1"}, {"off", "-1"} };
+            string vqd = await GetVqd(keywords);
+            var safesearchBase = new Dictionary<string, string> { { "on", "1" }, { "moderate", "1" }, { "off", "-1" } };
             string f = string.Join(",", new[] {
                 timelimit != null ? $"time:{timelimit}" : "",
                 size != null ? $"size:{size}" : "",
@@ -456,7 +431,7 @@ namespace DuckDuckGoSearch
 
             for (int i = 0; i < 5; i++)
             {
-                using var resp = GetUrl("GET", "https://duckduckgo.com/i.js", paramsDict: payload, headers: new Dictionary<string, string> { {"Referer", "https://duckduckgo.com/"} });
+                using var resp = await GetUrl("GET", "https://duckduckgo.com/i.js", paramsDict: payload, headers: new Dictionary<string, string> { { "Referer", "https://duckduckgo.com/" } });
                 string jsonStr = resp.Content.ReadAsStringAsync().Result;
                 var respJson = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonStr);
                 var pageData = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(respJson["results"].ToString());
@@ -488,7 +463,7 @@ namespace DuckDuckGoSearch
             return results;
         }
 
-        public List<Dictionary<string, string>> Videos(
+        public async Task<List<Dictionary<string, string>>> Videos(
             string keywords,
             string region = "wt-wt",
             string safesearch = "moderate",
@@ -500,8 +475,8 @@ namespace DuckDuckGoSearch
         {
             if (string.IsNullOrEmpty(keywords)) throw new ArgumentException("keywords is mandatory");
 
-            string vqd = GetVqd(keywords);
-            var safesearchBase = new Dictionary<string, string> { {"on", "1"}, {"moderate", "-1"}, {"off", "-2"} };
+            string vqd =await GetVqd(keywords);
+            var safesearchBase = new Dictionary<string, string> { { "on", "1" }, { "moderate", "-1" }, { "off", "-2" } };
             string f = string.Join(",", new[] {
                 timelimit != null ? $"publishedAfter:{timelimit}" : "",
                 resolution != null ? $"videoDefinition:{resolution}" : "",
@@ -519,7 +494,7 @@ namespace DuckDuckGoSearch
 
             for (int i = 0; i < 8; i++)
             {
-                using var resp = GetUrl("GET", "https://duckduckgo.com/v.js", paramsDict: payload);
+                using var resp =await GetUrl("GET", "https://duckduckgo.com/v.js", paramsDict: payload);
                 string jsonStr = resp.Content.ReadAsStringAsync().Result;
                 var respJson = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonStr);
                 var pageData = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(respJson["results"].ToString());
@@ -541,7 +516,7 @@ namespace DuckDuckGoSearch
             return results;
         }
 
-        public List<Dictionary<string, string>> News(
+        public async Task<List<Dictionary<string, string>>> News(
             string keywords,
             string region = "wt-wt",
             string safesearch = "moderate",
@@ -550,8 +525,8 @@ namespace DuckDuckGoSearch
         {
             if (string.IsNullOrEmpty(keywords)) throw new ArgumentException("keywords is mandatory");
 
-            string vqd = GetVqd(keywords);
-            var safesearchBase = new Dictionary<string, string> { {"on", "1"}, {"moderate", "-1"}, {"off", "-2"} };
+            string vqd = await GetVqd(keywords);
+            var safesearchBase = new Dictionary<string, string> { { "on", "1" }, { "moderate", "-1" }, { "off", "-2" } };
             var payload = new Dictionary<string, string>
             {
                 {"l", region}, {"o", "json"}, {"noamp", "1"}, {"q", keywords}, {"vqd", vqd}, {"p", safesearchBase[safesearch.ToLower()]}
@@ -563,7 +538,7 @@ namespace DuckDuckGoSearch
 
             for (int i = 0; i < 5; i++)
             {
-                using var resp = GetUrl("GET", "https://duckduckgo.com/news.js", paramsDict: payload);
+                using var resp = await GetUrl("GET", "https://duckduckgo.com/news.js", paramsDict: payload);
                 string jsonStr = resp.Content.ReadAsStringAsync().Result;
                 var respJson = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonStr);
                 var pageData = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(respJson["results"].ToString());

@@ -1,0 +1,41 @@
+name: Publish to NuGet on Release
+
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x' 
+
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+
+      - name: Build Project
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Get Version from Tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+
+      - name: Pack NuGet Package
+        run: dotnet pack --configuration Release --no-build --output ./nupkg -p:Version=${{ env.VERSION }}
+
+      - name: Publish to NuGet
+        run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

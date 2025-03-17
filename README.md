@@ -4,7 +4,7 @@
 
 طراحی این کتاب خانه از کتاب خانه [duckduckgo_search](https://github.com/deedy5/duckduckgo_search) الگو برداری شده.
 
-### [English version](https://github.com/behroozbc/DuckDuckGoDotNet/README_EN.md)
+### [English version](https://github.com/behroozbc/DuckDuckGoDotNet/blob/master/README_EN.md)
 
 ## فهرست مطالب
 

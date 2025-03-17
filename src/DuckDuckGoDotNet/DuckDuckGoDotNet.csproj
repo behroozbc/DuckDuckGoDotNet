@@ -4,8 +4,25 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Authors>behroozbc</Authors>
+    <Description>Duck duck go search</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/behroozbc/DuckDuckGoDotNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/behroozbc/DuckDuckGoDotNet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishProfile>nuget</PublishProfile>
+    <ReadmeFile>README.md</ReadmeFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <Version>0.1.0</Version>
+    <Tags>AI,DuckDuckGo,Search</Tags>
   </PropertyGroup>
-
+	<ItemGroup>
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.12.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.3" />

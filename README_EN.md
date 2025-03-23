@@ -1,8 +1,14 @@
+[![GitHub issues](https://badgen.net/github/issues/Naereen/Strapdown.js/)](https://github.com/behroozbc/DuckDuckGoDotNet/issues/)  
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+
 # DuckDuckGo
 
 Chat with AI and search for text, news, images, and videos using the DuckDuckGo.com search engine, implemented in C#.
 
-The design of this library is inspired by the [duckduckgo_search](https://github.com/deedy5/duckduckgo_search) library.
+The design of this library was modeled after the library [duckduckgo_search](https://github.com/deedy5/duckduckgo_search).
+
+If you have any suggestions or issues, please make sure to open an issue.  
+### [English version](https://github.com/behroozbc/DuckDuckGoDotNet/blob/master/README_EN.md)
 
 ## Table of Contents
 
@@ -13,7 +19,7 @@ The design of this library is inspired by the [duckduckgo_search](https://github
 
 ## Installation
 
-To install this library in your project, download the NuGet package for this library:
+To install this library in your project, you must download it from NuGet.
 
 ```bash
 dotnet add DuckDuckGoDotNet
@@ -21,11 +27,11 @@ dotnet add DuckDuckGoDotNet
 
 ## Proxy
 
-The package supports HTTP/HTTPS/SOCKS proxies. Example: http://user:pass@example.com:3128. Use a rotating proxy; otherwise, each time the DuckDuckGoSearch class is instantiated, it will use a new proxy.
+The package supports http/https/socks proxies. Example: http://user:pass@example.com:3128. Use a rotating proxy. Otherwise, a new proxy will be used for each instantiation of the DuckDuckGoSearch class.
 
 ## Chat
 
-To chat with the ready DuckDuckGo AI, you can use the following command:
+To chat with the ready-to-use DuckDuckGo AI, you can use the following command.
 
 ```c#
 /// <summary>
@@ -34,9 +40,7 @@ To chat with the ready DuckDuckGo AI, you can use the following command:
 /// <param name="keywords">The initial message or question to send to the AI.</param>
 /// <param name="model">The model to use: "gpt-4o-mini", "llama-3.3-70b", "claude-3-haiku",
 ///     "o3-mini", "mistral-small-3". Defaults to "gpt-4o-mini".</param>
-/// <param name="timeout">Timeout value for the HTTP client in seconds. Defaults to 30.</param>
-/// <returns>The response from the AI as a string.</returns>
-public string Chat(string message, Model model = Model.Gpt4oMini, int timeout = 30)
+public string Chat(string message, Model model = Model.Gpt4oMini)
 ```
 
 **_Example_**
@@ -79,12 +83,12 @@ public async Task<IEnumerable<TextSearchItem>> TextAsync(
 var search = await (new DuckDuckGoSearch()).Text("Iran");
 foreach (var item in search)
 {
-    var title = item["title"];
-    Console.WriteLine(title);
+    var a = item["title"];
+    Console.WriteLine(a);
 }
 ```
 
-## Images
+## Image
 
 You can perform an image search using the `ImagesAsync` method.
 
@@ -121,7 +125,7 @@ public async Task<IEnumerable<ImageSearchItem>> ImagesAsync(
     int? maxResults = null)
 ```
 
-## Videos
+## Video
 
 You can perform a video search using the `VideosAsync` method.
 
@@ -173,4 +177,4 @@ public async Task<IEnumerable<NewsSearchItem>> NewsAsync(
 
 ## Disclaimer
 
-This library has no affiliation with DuckDuckGo and is designed solely for educational purposes. This library is not intended for commercial use or for any purpose that would violate the DuckDuckGo terms of service. By using this library, you confirm that you will not use it in any manner that violates DuckDuckGo's terms. The official DuckDuckGo website can be accessed at https://duckduckgo.com.
+This library has no affiliation with DuckDuckGo and is designed for educational purposes only. It is not intended for commercial use or any purpose that violates DuckDuckGo's terms of service. By using this library, you confirm that you will not use it in any manner that violates DuckDuckGo's terms. The official DuckDuckGo website is accessible at https://duckduckgo.com.

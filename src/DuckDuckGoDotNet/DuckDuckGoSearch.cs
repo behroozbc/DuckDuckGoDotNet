@@ -20,6 +20,7 @@ namespace DuckDuckGoDotNet
         private List<Dictionary<string, string>> chatMessages = new List<Dictionary<string, string>>();
         private int chatTokensCount = 0;
         private string chatVqd = "";
+        private string chatVqdHash = "";
         private static readonly string[] impersonates = new string[]
         {
             "chrome_100", "chrome_101", "chrome_104", "chrome_105", "chrome_106", "chrome_107",
@@ -163,15 +164,19 @@ namespace DuckDuckGoDotNet
             stream.Read(content, 0, content.Length);
             return Utils.ExtractVqd(content, keywords);
         }
-
-        public async IAsyncEnumerable<string> ChatTokensAysnc(string keywords, Model model = Model.Gpt4oMini, int timeout = 30)
+        private async Task<(string vqd, string hash)> GetChatVqdAsync(bool force = false)
         {
-            if (string.IsNullOrEmpty(chatVqd))
+
+            if (string.IsNullOrEmpty(chatVqd) || force || string.IsNullOrEmpty(chatVqdHash))
             {
                 using var resp = await GetUrl("GET", "https://duckduckgo.com/duckchat/v1/status", headers: new Dictionary<string, string> { { "x-vqd-accept", "1" } }, timeout: timeout);
-                chatVqd = resp.Headers.GetValues("x-vqd-4").FirstOrDefault() ?? "";
+                return (resp.Headers.GetValues("x-vqd-4").FirstOrDefault(chatVqd), resp.Headers.GetValues("x-vqd-hash-1").FirstOrDefault(chatVqdHash));
             }
-
+            return (chatVqd, chatVqdHash);
+        }
+        public async IAsyncEnumerable<string> ChatTokensAysnc(string keywords, Model model = Model.Gpt4oMini)
+        {
+            (this.chatVqd, this.chatVqdHash) = await GetChatVqdAsync();
             chatMessages.Add(new Dictionary<string, string> { { "role", "user" }, { "content", keywords } });
             chatTokensCount += Math.Max(keywords.Length / 4, 1);
 
@@ -182,11 +187,11 @@ namespace DuckDuckGoDotNet
 
             };
             request.Headers.Add("x-vqd-4", chatVqd);
-            // client.Timeout = TimeSpan.FromSeconds(timeout);
+            request.Headers.Add("x-vqd-hash-1", chatVqdHash);
 
             var response = client.Send(request);
             chatVqd = response.Headers.GetValues("x-vqd-4").FirstOrDefault() ?? chatVqd;
-
+            chatVqdHash = response.Headers.GetValues("x-vqd-hash-1").FirstOrDefault() ?? chatVqdHash;
             using (var stream = response.Content.ReadAsStream())
             using (var reader = new StreamReader(stream))
             {
@@ -242,12 +247,10 @@ namespace DuckDuckGoDotNet
         /// <param name="keywords">The initial message or question to send to the AI.</param>
         /// <param name="model">The model to use: "gpt-4o-mini", "llama-3.3-70b", "claude-3-haiku",
         ///     "o3-mini", "mistral-small-3". Defaults to "gpt-4o-mini".</param>
-        /// <param name="timeout">Timeout value for the HTTP client in seconds. Defaults to 30.</param>
-        /// <returns>The response from the AI as a string.</returns>
-        public string Chat(string message, Model model = Model.Gpt4oMini, int timeout = 30)
+        public string Chat(string message, Model model = Model.Gpt4oMini)
         {
 
-            return string.Join("", ChatTokensAysnc(message, model, timeout).ToEnumerable());
+            return string.Join("", ChatTokensAysnc(message, model).ToEnumerable());
         }
         /// <summary>
         /// DuckDuckGo text search. Query params: https://duckduckgo.com/params.

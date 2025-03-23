@@ -31,8 +31,10 @@ jobs:
 
       - name: Get Version from Tag
         id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
+        run: |
+            VERSION=${GITHUB_REF#refs/tags/}
+            VERSION=${VERSION#v}
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Pack NuGet Package
         run: dotnet pack --configuration Release --no-build --output ./nupkg -p:Version=${{ env.VERSION }}

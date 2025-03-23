@@ -1,9 +1,13 @@
+[![GitHub issues](https://badgen.net/github/issues/Naereen/Strapdown.js/)](https://github.com/behroozbc/DuckDuckGoDotNet/issues/)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+
 # DuckDuckGo
 
 چت هوش مصنوعی و جستجو برای متن، اخبار، تصاویر و ویدیوها با استفاده از موتور جستجوی DuckDuckGo.com، پیاده‌سازی شده در سی شارپ.
 
 طراحی این کتاب خانه از کتاب خانه [duckduckgo_search](https://github.com/deedy5/duckduckgo_search) الگو برداری شده.
 
+درصورت داشتن هر گونه پیشنهاد یا مشکل حتما ایشو درست کنید.
 ### [English version](https://github.com/behroozbc/DuckDuckGoDotNet/blob/master/README_EN.md)
 
 ## فهرست مطالب
@@ -36,9 +40,7 @@ dotnet add DuckDuckGoDotNet
         /// <param name="keywords">The initial message or question to send to the AI.</param>
         /// <param name="model">The model to use: "gpt-4o-mini", "llama-3.3-70b", "claude-3-haiku",
         ///     "o3-mini", "mistral-small-3". Defaults to "gpt-4o-mini".</param>
-        /// <param name="timeout">Timeout value for the HTTP client in seconds. Defaults to 30.</param>
-        /// <returns>The response from the AI as a string.</returns>
-        public string Chat(string message, Model model = Model.Gpt4oMini, int timeout = 30)
+        public string Chat(string message, Model model = Model.Gpt4oMini)
 ```
 
 **_نمونه_**

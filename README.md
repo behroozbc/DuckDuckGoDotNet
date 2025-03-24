@@ -40,7 +40,8 @@ dotnet add DuckDuckGoDotNet
         /// <param name="keywords">The initial message or question to send to the AI.</param>
         /// <param name="model">The model to use: "gpt-4o-mini", "llama-3.3-70b", "claude-3-haiku",
         ///     "o3-mini", "mistral-small-3". Defaults to "gpt-4o-mini".</param>
-        public string Chat(string message, Model model = Model.Gpt4oMini)
+        /// <param name="chatHistory"> the chat history that the LLM needs to know on answering.</params>
+        public string Chat(string message, Model model = Model.Gpt4oMini,IEnumerable<ChatResponse>? chatHistory=null)
 ```
 
 **_نمونه_**

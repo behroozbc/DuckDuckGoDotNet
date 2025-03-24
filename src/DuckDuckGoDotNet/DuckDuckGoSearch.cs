@@ -181,6 +181,7 @@ namespace DuckDuckGoDotNet
             if (chatHistory is not null)
             {
                 chatMessages.AddRange(chatHistory.ToList().Select(x => new Dictionary<string, string> { { "role", x.Role.ToRole() }, { "content", x.Content } }));
+                chatTokensCount += chatHistory.Sum(x => x.Content.Length);
             }
             chatMessages.Add(new Dictionary<string, string> { { "role", ChatRole.User.ToRole() }, { "content", keywords } });
             chatTokensCount += Math.Max(keywords.Length / 4, 1);
@@ -254,7 +255,6 @@ namespace DuckDuckGoDotNet
         ///     "o3-mini", "mistral-small-3". Defaults to "gpt-4o-mini".</param>
         public string Chat(string message, Model model = Model.Gpt4oMini, IEnumerable<ChatResponse>? chatHistory = null)
         {
-
             return string.Join("", ChatTokensAysnc(message, model,chatHistory).ToEnumerable());
         }
         /// <summary>

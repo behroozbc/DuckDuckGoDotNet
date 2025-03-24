@@ -189,7 +189,7 @@ namespace DuckDuckGoDotNet
             request.Headers.Add("x-vqd-4", chatVqd);
             request.Headers.Add("x-vqd-hash-1", chatVqdHash);
 
-            var response = client.Send(request);
+            var response =await  client.SendAsync(request);
             chatVqd = response.Headers.GetValues("x-vqd-4").FirstOrDefault() ?? chatVqd;
             chatVqdHash = response.Headers.GetValues("x-vqd-hash-1").FirstOrDefault() ?? chatVqdHash;
             using (var stream = response.Content.ReadAsStream())

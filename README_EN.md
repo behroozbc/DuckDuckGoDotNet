@@ -1,13 +1,12 @@
-
-[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)  
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 
 # DuckDuckGo
 
-Chat-based AI and search for text, news, images, and videos using the DuckDuckGo.com search engine, implemented in C#.
+An AI chat and search for texts, news, images, and videos using the DuckDuckGo.com search engine, implemented in C#.
 
-The design of this library is patterned after the [duckduckgo_search](https://github.com/deedy5/duckduckgo_search) library.
+The design of this library was inspired by the [duckduckgo_search](https://github.com/deedy5/duckduckgo_search) library.
 
-If you have any suggestions or issues, please be sure to create an issue.  
+If you have any suggestions or issues, please be sure to create an issue.
 ### [English version](https://github.com/behroozbc/DuckDuckGoDotNet/blob/master/README_EN.md)
 
 ## Table of Contents
@@ -19,7 +18,7 @@ If you have any suggestions or issues, please be sure to create an issue.
 
 ## Installation
 
-To install this library in your project, you must download it from its NuGet package.
+To install this library in your project, download the library from [NuGet](https://www.nuget.org/packages/DuckDuckGoDotNet/).
 
 ```bash
 dotnet add DuckDuckGoDotNet
@@ -27,11 +26,11 @@ dotnet add DuckDuckGoDotNet
 
 ## Proxy
 
-The package supports http/https/socks proxies. Example: http://user:pass@example.com:3128. Use a rotating proxy. Otherwise, a new proxy will be used every time the DuckDuckGoSearch class is initialized.
+The package supports http/https/socks proxies. Example: http://user:pass@example.com:3128. Use a rotating proxy. Otherwise, a new proxy will be used every time an instance of the DuckDuckGoSearch class is initialized.
 
 ## Chat
 
-To interact with the DuckDuckGo AI, you can use the following command.
+To chat with the DuckDuckGo AI, you can use the following command.
 
 ```c#
         /// <summary>
@@ -40,11 +39,11 @@ To interact with the DuckDuckGo AI, you can use the following command.
         /// <param name="keywords">The initial message or question to send to the AI.</param>
         /// <param name="model">The model to use: "gpt-4o-mini", "llama-3.3-70b", "claude-3-haiku",
         ///     "o3-mini", "mistral-small-3". Defaults to "gpt-4o-mini".</param>
-        /// <param name="chatHistory">The chat history that the LLM needs to consider when answering.</param>
-        public string Chat(string message, Model model = Model.Gpt4oMini,IEnumerable<ChatResponse>? chatHistory=null)
+        /// <param name="chatHistory">The chat history that the LLM needs to know when answering.</param>
+        public string Chat(string message, Model model = Model.Gpt4oMini, IEnumerable<ChatResponse>? chatHistory = null)
 ```
 
-**Example**
+**_Example_**
 
 ```python
 var results = new DuckDuckGoSearch().Chat("Tell me about Iran's history", Model.Llama3370b);
@@ -52,7 +51,7 @@ var results = new DuckDuckGoSearch().Chat("Tell me about Iran's history", Model.
 
 ## Search
 
-You can perform a text search using the `TextAsync` method.
+You can perform text search operations using the `TextAsync` command.
 
 ```c#
         /// <summary>
@@ -78,7 +77,7 @@ You can perform a text search using the `TextAsync` method.
             int? maxResults = null)
 ```
 
-**Example**
+**_Example_**
 
 ```C#
 var search = await (new DuckDuckGoSearch()).Text("Iran");
@@ -91,7 +90,7 @@ foreach (var item in search)
 
 ## Image
 
-You can perform an image search using the `ImagesAsync` method.
+You can perform image search operations using the `ImagesAsync` command.
 
 ```c#
  /// <summary>
@@ -128,7 +127,7 @@ You can perform an image search using the `ImagesAsync` method.
 
 ## Video
 
-You can perform a video search using the `VideosAsync` method.
+You can perform video search operations using the `VideosAsync` command.
 
 ```c#
 /// <summary>
@@ -156,7 +155,7 @@ You can perform a video search using the `VideosAsync` method.
 
 ## News
 
-You can perform a news search using the `NewsAsync` method.
+You can perform news search operations using the `NewsAsync` command.
 
 ```c#
         /// <summary>
@@ -178,4 +177,4 @@ You can perform a news search using the `NewsAsync` method.
 
 ## Disclaimer
 
-This library is not affiliated with DuckDuckGo and is designed solely for educational purposes. It is not intended for commercial use or any purpose that violates DuckDuckGo's terms of service. By using this library, you acknowledge that you will not use it in any manner that breaches DuckDuckGo's conditions. The official DuckDuckGo website can be accessed at https://duckduckgo.com.  
+This library has no affiliation with DuckDuckGo and is intended solely for educational purposes. It is not intended for commercial use or any purpose that may violate DuckDuckGo's terms of service. By using this library, you confirm that you will not use it in any way that violates DuckDuckGo's terms. The official DuckDuckGo website is available at https://duckduckgo.com.

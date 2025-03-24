@@ -1,4 +1,3 @@
-[![GitHub issues](https://badgen.net/github/issues/Naereen/Strapdown.js/)](https://github.com/behroozbc/DuckDuckGoDotNet/issues/)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 
 # DuckDuckGo
@@ -19,7 +18,7 @@
 
 ## نصب
 
-برای نصب این کتابخانه در پروژه خود باید از نوگت این کتاب خانه را دانلود کنید.
+برای نصب این کتابخانه در پروژه خود باید از [نوگت](https://www.nuget.org/packages/DuckDuckGoDotNet/) این کتاب خانه را دانلود کنید.
 
 ```bash
 dotnet add DuckDuckGoDotNet

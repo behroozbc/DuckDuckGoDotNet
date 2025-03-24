@@ -45,7 +45,7 @@ dotnet add DuckDuckGoDotNet
 
 **_نمونه_**
 
-```python
+```c#
 var results= new DuckDuckGoSearch().Chat("Tell me about Iran's history",Model.Llama3370b);
 ```
 

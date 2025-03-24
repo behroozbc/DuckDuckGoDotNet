@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DuckDuckGoDotNet
 {
-    public class DuckDuckGoSearch
+    public class DuckDuckGoSearch:IDisposable
     {
         private static readonly ILogger<DuckDuckGoSearch> logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<DuckDuckGoSearch>();
 
@@ -620,6 +620,11 @@ namespace DuckDuckGoDotNet
                 payload["s"] = next.Split("s=")[1].Split("&")[0];
             }
             return results;
+        }
+
+        public void Dispose()
+        {
+            client.Dispose();
         }
     }
 }

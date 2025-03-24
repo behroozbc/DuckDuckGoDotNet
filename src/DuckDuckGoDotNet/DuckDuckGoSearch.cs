@@ -5,6 +5,7 @@ using DuckDuckGoDotNet.AI;
 using DuckDuckGoDotNet.Search;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace DuckDuckGoDotNet
 {
@@ -174,13 +175,18 @@ namespace DuckDuckGoDotNet
             }
             return (chatVqd, chatVqdHash);
         }
-        public async IAsyncEnumerable<string> ChatTokensAysnc(string keywords, Model model = Model.Gpt4oMini)
+        public async IAsyncEnumerable<string> ChatTokensAysnc(string keywords, Model model = Model.Gpt4oMini, IEnumerable<ChatResponse>? chatHistory = null)
         {
             (this.chatVqd, this.chatVqdHash) = await GetChatVqdAsync();
-            chatMessages.Add(new Dictionary<string, string> { { "role", "user" }, { "content", keywords } });
+            if (chatHistory is not null)
+            {
+                chatMessages.AddRange(chatHistory.ToList().Select(x => new Dictionary<string, string> { { "role", x.Role.ToRole() }, { "content", x.Content } }));
+                chatTokensCount += chatHistory.Sum(x => x.Content.Length);
+            }
+            chatMessages.Add(new Dictionary<string, string> { { "role", ChatRole.User.ToRole() }, { "content", keywords } });
             chatTokensCount += Math.Max(keywords.Length / 4, 1);
 
-            var jsonData = new { model = Models.GetModel(model), messages = chatMessages };
+            var jsonData = new { model = model.ToModelName(), messages = chatMessages };
             var request = new HttpRequestMessage(HttpMethod.Post, "https://duckduckgo.com/duckchat/v1/chat")
             {
                 Content = new StringContent(JsonSerializer.Serialize(jsonData), Encoding.UTF8, "application/json"),
@@ -189,7 +195,7 @@ namespace DuckDuckGoDotNet
             request.Headers.Add("x-vqd-4", chatVqd);
             request.Headers.Add("x-vqd-hash-1", chatVqdHash);
 
-            var response = client.Send(request);
+            var response = await client.SendAsync(request);
             chatVqd = response.Headers.GetValues("x-vqd-4").FirstOrDefault() ?? chatVqd;
             chatVqdHash = response.Headers.GetValues("x-vqd-hash-1").FirstOrDefault() ?? chatVqdHash;
             using (var stream = response.Content.ReadAsStream())
@@ -247,10 +253,9 @@ namespace DuckDuckGoDotNet
         /// <param name="keywords">The initial message or question to send to the AI.</param>
         /// <param name="model">The model to use: "gpt-4o-mini", "llama-3.3-70b", "claude-3-haiku",
         ///     "o3-mini", "mistral-small-3". Defaults to "gpt-4o-mini".</param>
-        public string Chat(string message, Model model = Model.Gpt4oMini)
+        public string Chat(string message, Model model = Model.Gpt4oMini, IEnumerable<ChatResponse>? chatHistory = null)
         {
-
-            return string.Join("", ChatTokensAysnc(message, model).ToEnumerable());
+            return string.Join("", ChatTokensAysnc(message, model,chatHistory).ToEnumerable());
         }
         /// <summary>
         /// DuckDuckGo text search. Query params: https://duckduckgo.com/params.

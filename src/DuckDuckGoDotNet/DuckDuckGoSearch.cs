@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace DuckDuckGoDotNet
 {
-    public class DuckDuckGoSearch:IDisposable
+    public class DuckDuckGoSearch : IDisposable
     {
         private static readonly ILogger<DuckDuckGoSearch> logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<DuckDuckGoSearch>();
 
@@ -181,7 +181,7 @@ namespace DuckDuckGoDotNet
             if (chatHistory is not null)
             {
                 chatMessages.AddRange(chatHistory.ToList().Select(x => new Dictionary<string, string> { { "role", x.Role.ToRole() }, { "content", x.Content } }));
-                chatTokensCount += chatHistory.Sum(x => x.Content.Length);
+                chatTokensCount += chatHistory.Sum(x => Math.Max(x.Content.Length / 4, 1));
             }
             chatMessages.Add(new Dictionary<string, string> { { "role", ChatRole.User.ToRole() }, { "content", keywords } });
             chatTokensCount += Math.Max(keywords.Length / 4, 1);
@@ -193,9 +193,13 @@ namespace DuckDuckGoDotNet
 
             };
             request.Headers.Add("x-vqd-4", chatVqd);
-            request.Headers.Add("x-vqd-hash-1", chatVqdHash);
+            request.Headers.Add("x-vqd-hash-1", "");
 
             var response = await client.SendAsync(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new Exception("HTTP ERROR:" + response.StatusCode);
+            }
             chatVqd = response.Headers.GetValues("x-vqd-4").FirstOrDefault() ?? chatVqd;
             chatVqdHash = response.Headers.GetValues("x-vqd-hash-1").FirstOrDefault() ?? chatVqdHash;
             using (var stream = response.Content.ReadAsStream())
@@ -255,7 +259,7 @@ namespace DuckDuckGoDotNet
         ///     "o3-mini", "mistral-small-3". Defaults to "gpt-4o-mini".</param>
         public string Chat(string message, Model model = Model.Gpt4oMini, IEnumerable<ChatResponse>? chatHistory = null)
         {
-            return string.Join("", ChatTokensAysnc(message, model,chatHistory).ToEnumerable());
+            return string.Join("", ChatTokensAysnc(message, model, chatHistory).ToEnumerable());
         }
         /// <summary>
         /// DuckDuckGo text search. Query params: https://duckduckgo.com/params.

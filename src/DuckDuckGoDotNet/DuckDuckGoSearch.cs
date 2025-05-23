@@ -1,11 +1,9 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using DuckDuckGoDotNet.AI;
 using DuckDuckGoDotNet.Search;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 
 namespace DuckDuckGoDotNet
 {
@@ -19,9 +17,6 @@ namespace DuckDuckGoDotNet
         private readonly bool verify;
 
         private List<Dictionary<string, string>> chatMessages = new List<Dictionary<string, string>>();
-        private int chatTokensCount = 0;
-        private string chatVqd = "";
-        private string chatVqdHash = "";
         private static readonly string[] impersonates = new string[]
         {
             "chrome_100", "chrome_101", "chrome_104", "chrome_105", "chrome_106", "chrome_107",
@@ -165,102 +160,7 @@ namespace DuckDuckGoDotNet
             stream.Read(content, 0, content.Length);
             return Utils.ExtractVqd(content, keywords);
         }
-        private async Task<(string vqd, string hash)> GetChatVqdAsync(bool force = false)
-        {
-
-            if (string.IsNullOrEmpty(chatVqd) || force || string.IsNullOrEmpty(chatVqdHash))
-            {
-                using var resp = await GetUrl("GET", "https://duckduckgo.com/duckchat/v1/status", headers: new Dictionary<string, string> { { "x-vqd-accept", "1" } }, timeout: timeout);
-                return (resp.Headers.GetValues("x-vqd-4").FirstOrDefault(chatVqd), resp.Headers.GetValues("x-vqd-hash-1").FirstOrDefault(chatVqdHash));
-            }
-            return (chatVqd, chatVqdHash);
-        }
-        public async IAsyncEnumerable<string> ChatTokensAysnc(string keywords, Model model = Model.Gpt4oMini, IEnumerable<ChatResponse>? chatHistory = null)
-        {
-            (this.chatVqd, this.chatVqdHash) = await GetChatVqdAsync();
-            if (chatHistory is not null)
-            {
-                chatMessages.AddRange(chatHistory.ToList().Select(x => new Dictionary<string, string> { { "role", x.Role.ToRole() }, { "content", x.Content } }));
-                chatTokensCount += chatHistory.Sum(x => Math.Max(x.Content.Length / 4, 1));
-            }
-            chatMessages.Add(new Dictionary<string, string> { { "role", ChatRole.User.ToRole() }, { "content", keywords } });
-            chatTokensCount += Math.Max(keywords.Length / 4, 1);
-
-            var jsonData = new { model = model.ToModelName(), messages = chatMessages };
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://duckduckgo.com/duckchat/v1/chat")
-            {
-                Content = new StringContent(JsonSerializer.Serialize(jsonData), Encoding.UTF8, "application/json"),
-
-            };
-            request.Headers.Add("x-vqd-4", chatVqd);
-            request.Headers.Add("x-vqd-hash-1", "");
-
-            var response = await client.SendAsync(request);
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new Exception("HTTP ERROR:" + response.StatusCode);
-            }
-            chatVqd = response.Headers.GetValues("x-vqd-4").FirstOrDefault() ?? chatVqd;
-            chatVqdHash = response.Headers.GetValues("x-vqd-hash-1").FirstOrDefault() ?? chatVqdHash;
-            using (var stream = response.Content.ReadAsStream())
-            using (var reader = new StreamReader(stream))
-            {
-                string line;
-                List<string> chunks = new List<string>();
-                while ((line = await reader.ReadLineAsync()) != null)
-                {
-                    if (line.StartsWith("data:"))
-                    {
-                        string data = line.Substring(5).Trim();
-                        if (data == "[DONE]") break;
-                        if (data == "[DONE][LIMIT_CONVERSATION]") throw new ConversationLimitException("ERR_CONVERSATION_LIMIT");
-                        JsonElement x;
-                        try
-                        {
-                            x = JsonSerializer.Deserialize<JsonElement>(data);
-                        }
-                        catch (JsonException ex)
-                        {
-                            throw new DuckDuckGoSearchException($"chat_yield JsonException: {ex.Message}", ex);
-                        }
-
-                        if (x.ValueKind == JsonValueKind.Object)
-                        {
-                            if (x.TryGetProperty("action", out var action) && action.GetString() == "error")
-                            {
-                                string errMessage = x.TryGetProperty("type", out var typeProp) ? typeProp.GetString() : "";
-                                if (response.StatusCode == HttpStatusCode.TooManyRequests)
-                                {
-                                    if (errMessage == "ERR_CONVERSATION_LIMIT") throw new ConversationLimitException(errMessage);
-                                    throw new RatelimitException(errMessage);
-                                }
-                                throw new DuckDuckGoSearchException(errMessage);
-                            }
-                            else if (x.TryGetProperty("message", out var messageProp))
-                            {
-                                string message = messageProp.GetString();
-                                chunks.Add(message);
-                                yield return message;
-                            }
-                        }
-                    }
-                }
-                string result = string.Join("", chunks);
-                chatMessages.Add(new Dictionary<string, string> { { "role", "assistant" }, { "content", result } });
-                chatTokensCount += result.Length;
-            }
-            response.Dispose();
-        }
-        /// <summary>
-        /// Initiates a chat session with DuckDuckGo AI.
-        /// </summary>
-        /// <param name="keywords">The initial message or question to send to the AI.</param>
-        /// <param name="model">The model to use: "gpt-4o-mini", "llama-3.3-70b", "claude-3-haiku",
-        ///     "o3-mini", "mistral-small-3". Defaults to "gpt-4o-mini".</param>
-        public string Chat(string message, Model model = Model.Gpt4oMini, IEnumerable<ChatResponse>? chatHistory = null)
-        {
-            return string.Join("", ChatTokensAysnc(message, model, chatHistory).ToEnumerable());
-        }
+        
         /// <summary>
         /// DuckDuckGo text search. Query params: https://duckduckgo.com/params.
         /// </summary>

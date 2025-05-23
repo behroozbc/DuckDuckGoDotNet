@@ -13,7 +13,6 @@ If you have any suggestions or issues, please be sure to create an issue.
 
 - [Installation](#installation)
 - [Proxy](#proxy)
-- [Chat](#chat)
 - [Search](#search)
 
 ## Installation
@@ -27,27 +26,6 @@ dotnet add DuckDuckGoDotNet
 ## Proxy
 
 The package supports http/https/socks proxies. Example: http://user:pass@example.com:3128. Use a rotating proxy. Otherwise, a new proxy will be used every time an instance of the DuckDuckGoSearch class is initialized.
-
-## Chat
-
-To chat with the DuckDuckGo AI, you can use the following command.
-
-```c#
-        /// <summary>
-        /// Initiates a chat session with DuckDuckGo AI.
-        /// </summary>
-        /// <param name="keywords">The initial message or question to send to the AI.</param>
-        /// <param name="model">The model to use: "gpt-4o-mini", "llama-3.3-70b", "claude-3-haiku",
-        ///     "o3-mini", "mistral-small-3". Defaults to "gpt-4o-mini".</param>
-        /// <param name="chatHistory">The chat history that the LLM needs to know when answering.</param>
-        public string Chat(string message, Model model = Model.Gpt4oMini, IEnumerable<ChatResponse>? chatHistory = null)
-```
-
-**_Example_**
-
-```python
-var results = new DuckDuckGoSearch().Chat("Tell me about Iran's history", Model.Llama3370b);
-```
 
 ## Search
 

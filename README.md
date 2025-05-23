@@ -13,7 +13,6 @@
 
 - [نصب](#نصب)
 - [پروکسی](#پروکسی)
-- [چت](#چت)
 - [جستوجو](#جستوجو)
 
 ## نصب
@@ -27,27 +26,6 @@ dotnet add DuckDuckGoDotNet
 ## پروکسی
 
 پکیج از پروکسی‌های http/https/socks پشتیبانی می‌کند. مثال: http://user:pass@example.com:3128. از یک پروکسی چرخشی استفاده کنید. در غیر این صورت، با هر بار مقداردهی اولیه کلاس DuckDuckGoSearch از یک پروکسی جدید استفاده کنید.
-
-## چت
-
-برای چت کردن با هوش مصنوعی آماده duckduckgo میتونید از دستور زیر استفاده کنید.
-
-```c#
-        /// <summary>
-        /// Initiates a chat session with DuckDuckGo AI.
-        /// </summary>
-        /// <param name="keywords">The initial message or question to send to the AI.</param>
-        /// <param name="model">The model to use: "gpt-4o-mini", "llama-3.3-70b", "claude-3-haiku",
-        ///     "o3-mini", "mistral-small-3". Defaults to "gpt-4o-mini".</param>
-        /// <param name="chatHistory"> the chat history that the LLM needs to know on answering.</params>
-        public string Chat(string message, Model model = Model.Gpt4oMini,IEnumerable<ChatResponse>? chatHistory=null)
-```
-
-**_نمونه_**
-
-```c#
-var results= new DuckDuckGoSearch().Chat("Tell me about Iran's history",Model.Llama3370b);
-```
 
 ## جستوجو
 

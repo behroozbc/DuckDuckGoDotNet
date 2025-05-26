@@ -2,7 +2,7 @@
 
 # DuckDuckGo
 
-An AI chat and search for texts, news, images, and videos using the DuckDuckGo.com search engine, implemented in C#.
+Search for texts, news, images, and videos using the DuckDuckGo.com search engine, implemented in C#.
 
 The design of this library was inspired by the [duckduckgo_search](https://github.com/deedy5/duckduckgo_search) library.
 

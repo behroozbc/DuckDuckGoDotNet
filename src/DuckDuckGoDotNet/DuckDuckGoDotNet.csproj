@@ -14,7 +14,7 @@
     <ReadmeFile>README.md</ReadmeFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
     <EnablePackageValidation>true</EnablePackageValidation>
-    <Version>0.4.1</Version>
+    <Version>0.5.0</Version>
     <Tags>AI,DuckDuckGo,Search</Tags>
   </PropertyGroup>
 	<ItemGroup>

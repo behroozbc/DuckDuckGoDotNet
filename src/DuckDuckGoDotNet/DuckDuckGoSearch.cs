@@ -160,7 +160,7 @@ namespace DuckDuckGoDotNet
             stream.Read(content, 0, content.Length);
             return Utils.ExtractVqd(content, keywords);
         }
-        
+
         /// <summary>
         /// DuckDuckGo text search. Query params: https://duckduckgo.com/params.
         /// </summary>
@@ -416,7 +416,7 @@ namespace DuckDuckGoDotNet
         /// <param name="licenseVideos">creativeCommon, youtube. Defaults to null.</param>
         /// <param name="maxResults">Max number of results. If null, returns results only from the first response. Defaults to null.</param>
         /// <returns>List of video search results.</returns>
-        public async Task<List<Dictionary<string, string>>> VideosAsync(
+        public async Task<List<VideoSearchItem>> VideosAsync(
             string keywords,
             string region = "wt-wt",
             string safesearch = "moderate",
@@ -443,25 +443,15 @@ namespace DuckDuckGoDotNet
             };
 
             var cache = new HashSet<string>();
-            var results = new List<Dictionary<string, string>>();
+            var results = new List<VideoSearchItem>();
 
             for (int i = 0; i < 8; i++)
             {
                 using var resp = await GetUrl("GET", "https://duckduckgo.com/v.js", paramsDict: payload);
                 var jsonStr = await resp.Content.ReadAsStringAsync();
                 var respJson = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonStr);
-                var pageData = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(respJson["results"].ToString());
-
-                foreach (var row in pageData)
-                {
-                    if (!cache.Contains(row["content"]))
-                    {
-                        cache.Add(row["content"]);
-                        results.Add(row);
-                        if (maxResults.HasValue && results.Count >= maxResults.Value) return results;
-                    }
-                }
-
+                var pageData = JsonSerializer.Deserialize<List<VideoSearchItem>>(respJson["results"].ToString());
+                results.AddRange(pageData);
                 string next = respJson.ContainsKey("next") ? respJson["next"].ToString() : null;
                 if (string.IsNullOrEmpty(next) || !maxResults.HasValue) return results;
                 payload["s"] = next.Split("s=")[1].Split("&")[0];

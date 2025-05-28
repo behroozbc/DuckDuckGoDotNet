@@ -15,7 +15,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
     <EnablePackageValidation>true</EnablePackageValidation>
     <Version>0.5.0</Version>
-    <Tags>AI,DuckDuckGo,Search</Tags>
+    <Tags>DuckDuckGo,Search,Reseach</Tags>
   </PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\README.md">
